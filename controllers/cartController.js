@@ -19,8 +19,18 @@ const addToCart = async (req, res) => {
 };
 
 const getCart = async (req, res) => {
-    const cart = await Cart.findOne({ userId: req.user.userId });
-    res.json(cart || { items: [] });
+    try {
+        const cart = await Cart.findOne({ userId: req.user.userId })
+            .populate("items.productId", "name price");
+
+        if (!cart) {
+            return res.json({ items: [] });
+        }
+
+        res.json(cart);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching cart", error });
+    }
 };
 
 const removeFromCart = async (req, res) => {
