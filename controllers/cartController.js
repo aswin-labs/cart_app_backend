@@ -1,22 +1,37 @@
 import Cart from "../models/cartModel.js";
 
 const addToCart = async (req, res) => {
-  const { productId } = req.body;
-  const userId = req.user.userId;
-
-  let cart = await Cart.findOne({ userId });
-  if (!cart) cart = new Cart({ userId, items: [] });
-
-  const existingItem = cart.items.find((item) => item.productId === productId);
-  if (existingItem) {
-    existingItem.quantity++;
-  } else {
-    cart.items.push({ productId, quantity: 1 });
-  }
-
-  await cart.save();
-  res.json(cart);
-};
+    try {
+      const { productId } = req.body;
+      const userId = req.user.userId;
+  
+      let cart = await Cart.findOne({ userId });
+      if (!cart) cart = new Cart({ userId, items: [] });
+  
+      const existingItem = cart.items.find(
+        (item) => item.productId.toString() === productId
+      );
+  
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        cart.items.push({ productId, quantity: 1 });
+      }
+  
+      await cart.save();
+  
+      return res.json({
+        success: true,
+        message: "Product added to cart successfully",
+        addedProductId: productId,
+        quantity: existingItem ? existingItem.quantity : 1,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Server error while adding item to cart" });
+    }
+  };
+  
 
 const getCart = async (req, res) => {
     try {
@@ -56,6 +71,7 @@ const removeFromCart = async (req, res) => {
     
         await cart.save();
         return res.json({
+            success: true,
             message: "Product removed from cart successfully",
             removedProductId: productId,
           });
