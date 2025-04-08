@@ -16,7 +16,6 @@ const addProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     const userId = req.user.userId;
-
     // Get user's cart
     const cart = await Cart.findOne({ userId });
 
