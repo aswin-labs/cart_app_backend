@@ -1,5 +1,5 @@
-import Product from "../models/productModel.js";
 import Cart from "../models/cartModel.js";
+import Product from "../models/productModel.js";
 
 // Add Product - POST
 const addProduct = async (req, res) => {
@@ -12,40 +12,52 @@ const addProduct = async (req, res) => {
   }
 };
 
-// Get All Products - GET
+// *********Get All Products - GET -- without USERID**********
 const getAllProducts = async (req, res) => {
   try {
-    const userId = req.user.userId;
-    // Get user's cart
-    const cart = await Cart.findOne({ userId });
-
-    // Create a map of productId -> quantity
-    const cartMap = new Map();
-    if (cart) {
-      cart.items.forEach(item => {
-        cartMap.set(item.productId.toString(), item.quantity);
-      });
-    }
-
-    // Fetch all products
-    const products = await Product.find();
-
-    // Add alreadyInCart and count to each product
-    const updatedProducts = products.map(product => {
-      const quantity = cartMap.get(product._id.toString()) || 0;
-      return {
-        ...product.toObject(),
-        alreadyInCart: quantity > 0,
-        count: quantity
-      };
-    });
-
-    res.status(200).json(updatedProducts);
+    const products = await Product.find(); // Fetch all products
+    res.status(200).json(products);        // Return the product list as JSON
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching products", error });
   }
 };
+
+
+// *********Get All Products - GET -- USERID need **********
+// const getAllProducts = async (req, res) => {
+//   try {
+//     const userId = req.user.userId;
+//     // Get user's cart
+//     const cart = await Cart.findOne({ userId });
+
+//     // Create a map of productId -> quantity
+//     const cartMap = new Map();
+//     if (cart) {
+//       cart.items.forEach(item => {
+//         cartMap.set(item.productId.toString(), item.quantity);
+//       });
+//     }
+
+//     // Fetch all products
+//     const products = await Product.find();
+
+//     // Add alreadyInCart and count to each product
+//     const updatedProducts = products.map(product => {
+//       const quantity = cartMap.get(product._id.toString()) || 0;
+//       return {
+//         ...product.toObject(),
+//         alreadyInCart: quantity > 0,
+//         count: quantity
+//       };
+//     });
+
+//     res.status(200).json(updatedProducts);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error fetching products", error });
+//   }
+// };
 
 // Get Product by ID - GET
 const getSingleProduct = async (req, res) => {
