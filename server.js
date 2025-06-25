@@ -4,6 +4,8 @@ import connectDB from "./config/database.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js"
+import cors from "cors"
+
 
 dotenv.config();
 
@@ -11,6 +13,7 @@ const app = express();
 
 connectDB();
 app.use(express.json());
+app.use(cors())
 
 app.use("/api/product", productRoutes);
 app.use("/api/users", userRoutes);
